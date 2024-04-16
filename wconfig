@@ -2,5 +2,3 @@
 
 -m str "Word or message to be printed. Strings must be enclosed in parenteses."
 -n int "Number of times the message should be repeated."
-
-=hw -m "Hello, World!" -n 5
