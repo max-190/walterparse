@@ -37,23 +37,29 @@ class WP:
             raise Exception("Unsupported type encountered while parsing flag.")
         
         self.flags.append(Flag(f_name, f_type, flag_list[2]))
-    # TODO: check if data is instance of flag type
     def parse_shortcut(self, shortcut_string):
         shortcut_list = shlex.split(shortcut_string)
         flag_list: ShortcutFlag = []
         s_name = shortcut_list[0]
         for i in range(1, len(shortcut_list), 2):
+            found = False
             for j in range(len(self.flags)):
-                if shortcut_list[i] == self.flags[j].f_name:
-                    if self.flags[j].f_type ==  int:
-                        data = int(shortcut_list[i + 1])
-                    elif self.flags[j].f_type == float:
-                        data = float(shortcut_list[i + 1])
-                    else:
-                        data = str("\"" + shortcut_list[i + 1] + "\"")
+                try:
+                    if shortcut_list[i] == self.flags[j].f_name:
+                        if self.flags[j].f_type ==  int:
+                            data = int(shortcut_list[i + 1])
+                        elif self.flags[j].f_type == float:
+                            data = float(shortcut_list[i + 1])
+                        else:
+                            data = str("\"" + shortcut_list[i + 1] + "\"")
                     
-                    flag_list.append(ShortcutFlag(self.flags[j].f_name, self.flags[j], data))
-        
+                        flag_list.append(ShortcutFlag(self.flags[j].f_name, self.flags[j], data))
+                        found = True
+                except:
+                    raise Exception("Data type invalid. Expected: " + self.flags[j].f_type.__name__ + ", got: " + shortcut_list[i + 1])
+            if not found:
+                raise Exception("Flag not defined: " + shortcut_list[i])
+           
         self.shortcuts.append((shortcut_list[0], flag_list))
 
 
@@ -68,7 +74,7 @@ class WP:
             elif line in ["", "\n"]:
                 pass
             else:
-                raise Exception("Unexpected token encountered.")
+                raise Exception("Unexpected token encountered: " + line.split()[0])
     
     def print(self):
         print("Executable: " + self.executable)
@@ -77,14 +83,12 @@ class WP:
         for flag in self.flags:
             print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment)
 
-        print("\n\nSupported shortcuts:")
+        print("\nSupported shortcuts:")
         for sc in self.shortcuts:
             print(sc[0], end=" ")
             for flag in sc[1]:
-                print(flag.s_name + " " + str(flag.flag[1]), end=" ")
-            print("\n")
-
-        
+                print(flag.s_name + " " + str(flag.flag[1]), end=" ")  
+        print()      
 
 
 def main():

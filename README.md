@@ -39,3 +39,8 @@ WalterParse can be called using `wp ...` if stored in `bin/` or `./wp.py ...` if
 When calling with command line parameters, it must be of the form `wp -m <data_m> -n <data_n>`, where the data belonging to the flag must be of the correct type and immediately following the flag.
 
 When calling with a shortcut, it must be of the form `wp =x`.
+
+## to be implemented:
+- Default values
+- Define some flags, rest default
+- Shortcut but also define only some flags
