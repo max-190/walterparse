@@ -10,8 +10,8 @@ class Flag:
         self.f_comment = f_comment
 
 class FlagData:
-    def __init__(self, s_name:str, flag: Flag, data):
-        self.s_name = s_name
+    def __init__(self, name:str, flag: Flag, data):
+        self.name = name
         self.flag = (flag, data)
     
 
@@ -64,6 +64,37 @@ class WP:
                 raise Exception("Flag not defined: " + data_list[i])
   
         return flag_list
+    
+    # RUN PREPPING /////////////////////////////////////////////////////////////
+
+    def merge_shortcut_with_default(self, s_name: str) -> list:
+        for sc in self.shortcuts:
+            if s_name == sc[0]:
+                return self.merge_with_default(sc[1])
+
+    def merge_with_default(self, user_list: list) -> list:
+        for d_flag in self.default:
+            if d_flag.name not in [u.name for u in user_list]:
+                user_list.append(d_flag)
+        
+        return user_list
+
+    def order(self, user_list: list) -> list:
+        for i in range(len(self.flags)): # len(flags) should equal len(user_list)
+            for j in range(i, len(user_list)):
+                if user_list[j].name == self.flags[i].f_name:
+                    if i != j:
+                        user_list[i], user_list[j] = user_list[j], user_list[i]
+                    break
+        
+        return user_list
+    
+    def convert_to_call(self, flag_list: list) -> str:
+        call = self.executable[:-1] + " "
+        for flag in flag_list:
+            call += str(flag.flag[1]) + " "
+        
+        return call
                      
 
     # CONSTRUCTOR //////////////////////////////////////////////////////////////
@@ -102,13 +133,13 @@ class WP:
         for sc in self.shortcuts:
             print(sc[0], end=" ")
             for flag in sc[1]:
-                print(flag.s_name + " " + str(flag.flag[1]), end=" ")
+                print(flag.name + " " + str(flag.flag[1]), end=" ")
           
         print("\n\nDefault call:")
         # TODO: executable contains newline or something
         print(self.executable[:-1], end=" ")
         for flag in self.default:
-            print(flag.s_name + " " + str(flag.flag[1]), end=" ")
+            print(flag.name + " " + str(flag.flag[1]), end=" ")
         print()
 
 def main() -> str:
@@ -117,18 +148,21 @@ def main() -> str:
     
     wp = WP(open("wconfig", 'r'))
 
-    if len(sys.argv) == 0:
-        #TODO: print helpful message about usage of program
-        pass
+    if len(sys.argv) == 1:
+        user_flags = wp.default
     elif len(sys.argv) > 1 and sys.argv[1] == '?':
         wp.print()
-    else:
-        user_flags = wp.parse_data(sys.argv)
-        
+        return ""
+    elif len(sys.argv) == 2:
+        if sys.argv[1].startswith('='):
+            user_flags = wp.merge_shortcut_with_default(sys.argv[1])
+    else:        
+        user_flags = wp.parse_data(sys.argv[:-1])
+        user_flags = wp.merge_with_default(user_flags)
+            
 
-    return ""
-
-
+    user_flags = wp.order(user_flags)
+    print(wp.convert_to_call(user_flags))
     
 
 if __name__ == "__main__":

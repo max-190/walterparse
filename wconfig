@@ -5,4 +5,4 @@
 
 > -m "Hi there!" -n 1
 
-=hw -m "Hello, World!" -n 5
+=hw -n 5 -m "Hello, world!"
