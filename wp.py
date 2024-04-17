@@ -44,7 +44,6 @@ class WP:
 
     def parse_data(self, data_list: list):
         flag_list: FlagData = []
-        s_name = data_list[0]
         for i in range(1, len(data_list), 2):
             found = False
             for j in range(len(self.flags)):
@@ -90,7 +89,7 @@ class WP:
             else:
                 raise Exception("Unexpected token encountered: " + line.split()[0])
     
-    # OTHER FUNCTIONS
+    # OTHER FUNCTIONS //////////////////////////////////////////////////////////
 
     def print(self):
         print("Executable: " + self.executable)
@@ -124,7 +123,8 @@ def main() -> str:
     elif len(sys.argv) > 1 and sys.argv[1] == '?':
         wp.print()
     else:
-        pass
+        user_flags = wp.parse_data(sys.argv)
+        
 
     return ""
 
