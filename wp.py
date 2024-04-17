@@ -17,9 +17,12 @@ class FlagData:
 
 class WP:
 
+    # MEMBER VARIABLES /////////////////////////////////////////////////////////
+
     flags: Flag = []
     shortcuts = [] # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
 
+    # WCONFIG PARSERS //////////////////////////////////////////////////////////
 
     def parse_flag(self, flag_string):
         flag_list = shlex.split(flag_string)
@@ -39,11 +42,7 @@ class WP:
         self.flags.append(Flag(f_name, f_type, flag_list[2]))
     
 
-    def parse_data(self, line: str, parse_shortcut: bool):
-        if self.default_defined and not parse_shortcut:
-            raise Exception("Default flags were already defined.")
-        
-        data_list = shlex.split(line)
+    def parse_data(self, data_list: list):
         flag_list: FlagData = []
         s_name = data_list[0]
         for i in range(1, len(data_list), 2):
@@ -64,33 +63,35 @@ class WP:
                     raise Exception("Data type invalid. Expected: " + self.flags[j].f_type.__name__ + ", got: " + data_list[i + 1])
             if not found:
                 raise Exception("Flag not defined: " + data_list[i])
+  
+        return flag_list
+                     
 
-        if parse_shortcut:   
-            self.shortcuts.append((data_list[0], flag_list))
-        else:
-            if len(flag_list) != len(self.flags):
-                raise Exception("Default should have a value for each flag.")
-            
-            self.default = flag_list
-            self.default_defined = True                     
-
+    # CONSTRUCTOR //////////////////////////////////////////////////////////////
 
     def __init__(self, config_file):
         self.default_defined = False
         for line in config_file.readlines():
+            data_list = shlex.split(line)
             if line.startswith("./"):
                 self.executable = line
             elif line.startswith('-'):
                 self.parse_flag(line)
             elif line.startswith('='):
-                self.parse_data(line, True)
+                self.shortcuts.append((data_list[0], self.parse_data(data_list)))
             elif line.startswith('>'):
-                self.parse_data(line, False)
+                if self.default_defined:
+                    raise Exception("Default flags were already defined.")
+                self.default = self.parse_data(data_list)
+                self.default_defined = True
+
             elif line in ["", "\n"]:
                 pass
             else:
                 raise Exception("Unexpected token encountered: " + line.split()[0])
     
+    # OTHER FUNCTIONS
+
     def print(self):
         print("Executable: " + self.executable)
 
@@ -111,14 +112,22 @@ class WP:
             print(flag.s_name + " " + str(flag.flag[1]), end=" ")
         print()
 
-def main():
+def main() -> str:
     if "wconfig" not in listdir():
-        raise Exception("wconfig not found, program terminated.")
+        raise Exception("wconfig not found.")
     
     wp = WP(open("wconfig", 'r'))
 
-    if len(sys.argv) > 1 and sys.argv[1] == '?':
+    if len(sys.argv) == 0:
+        #TODO: print helpful message about usage of program
+        pass
+    elif len(sys.argv) > 1 and sys.argv[1] == '?':
         wp.print()
+    else:
+        pass
+
+    return ""
+
 
     
 
