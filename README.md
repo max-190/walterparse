@@ -44,3 +44,5 @@ When calling with a shortcut, it must be of the form `wp =x`.
 - Default values
 - Define some flags, rest default
 - Shortcut but also define only some flags
+- Check for duplicate flags and shortcuts
+- Order flags to prevent linear search
