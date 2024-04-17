@@ -5,7 +5,8 @@ Converts intuitive command line parameters to a different format.
 
 ## Usage
 
-Placing the bash file and python file in the `bin/` folder allows for usage in any folder. 
+Place the bash file and python file in the `~/.local/bin`.
+Use `chmod +x wp` to make it an executable.
 
 ### Configuring the file 
 
@@ -21,6 +22,8 @@ For the program to function correctly, `wconfig` must be of the following format
 -<m> <type> <comment>
 -<n> ...
 
+> -m <data> -n <data>
+
 =x -<m> <data> -<n> <data>
 =y ...
 ````
@@ -30,15 +33,14 @@ Where:
 - `-<n>` is the flag for data in command line argument
 - `<type>` is the expected type of data following flag `-<n>`.
 - `<message>` contains information about flag `-<n>`.
+- `>` gives a default call.
 - `=x` is an optional shortcut allowing for quick access of program.
 
 ### Calling the program
 
-WalterParse can be called using `wp ...` if stored in `bin/` or `./wp.py ...` if stored in working directory. If called using only `wp`, all flags are printed with information.
+WalterParse can be called using `wp ...` if stored in `~/.local/bin/` or `./wp.py ...` if stored in working directory.
 
-When calling with command line parameters, it must be of the form `wp -m <data_m> -n <data_n>`, where the data belonging to the flag must be of the correct type and immediately following the flag.
-
-When calling with a shortcut, it must be of the form `wp =x`.
+WalterParse has several functionalities.
 
 ## to be implemented:
 - Default values

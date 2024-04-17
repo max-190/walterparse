@@ -1,6 +1,9 @@
 #!/bin/bash
 
-output=$(python3 wp.py "$@")
+# Get the directory of the current script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+output=$(python3 "$DIR/wp.py" "$@")
 
 if [ -n "$output" ]; then
     eval "$output"

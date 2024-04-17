@@ -114,6 +114,8 @@ class WP:
                     raise Exception("Default flags were already defined.")
                 self.default = self.parse_data(data_list)
                 self.default_defined = True
+                if len(self.default) != len(self.flags):
+                    raise Exception("Default does not contain correct amount of flags.")
 
             elif line in ["", "\n"]:
                 pass
@@ -123,24 +125,24 @@ class WP:
     # OTHER FUNCTIONS //////////////////////////////////////////////////////////
 
     def print(self):
-        print("Executable: " + self.executable)
+        sys.stderr.write("Executable: " + self.executable + "\n")
 
-        print("Supported flags:")
+        sys.stderr.write("Supported flags:\n")
         for flag in self.flags:
-            print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment)
+            sys.stderr.write(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment + "\n")
 
-        print("\nSupported shortcuts:")
+        sys.stderr.write("\nSupported shortcuts:\n")
         for sc in self.shortcuts:
-            print(sc[0], end=" ")
+            sys.stderr.write(sc[0] + " ")
             for flag in sc[1]:
-                print(flag.name + " " + str(flag.flag[1]), end=" ")
+                sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
           
-        print("\n\nDefault call:")
+        sys.stderr.write("\n\nDefault call:\n")
         # TODO: executable contains newline or something
-        print(self.executable[:-1], end=" ")
+        sys.stderr.write(self.executable[:-1] + " ")
         for flag in self.default:
-            print(flag.name + " " + str(flag.flag[1]), end=" ")
-        print()
+            sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
+        sys.stderr.write("\n")
 
 def main() -> str:
     if "wconfig" not in listdir():
@@ -149,6 +151,8 @@ def main() -> str:
     wp = WP(open("wconfig", 'r'))
 
     if len(sys.argv) == 1:
+        if not wp.default_defined:
+            raise Exception("No default flags were defined in wconfig")
         user_flags = wp.default
     elif len(sys.argv) > 1 and sys.argv[1] == '?':
         wp.print()
