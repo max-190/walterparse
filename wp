@@ -1,0 +1,7 @@
+#!/bin/bash
+
+output=$(python3 wp.py "$@")
+
+if [ -n "$output" ]; then
+    eval "$output"
+fi

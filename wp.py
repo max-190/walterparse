@@ -157,7 +157,7 @@ def main() -> str:
         if sys.argv[1].startswith('='):
             user_flags = wp.merge_shortcut_with_default(sys.argv[1])
     else:        
-        user_flags = wp.parse_data(sys.argv[:-1])
+        user_flags = wp.parse_data(sys.argv)
         user_flags = wp.merge_with_default(user_flags)
             
 
