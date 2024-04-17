@@ -18,7 +18,7 @@ class ShortcutFlag:
 class WP:
 
     flags: Flag = []
-    shortcuts = []
+    shortcuts = [] # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
 
 
     def parse_flag(self, flag_string):
@@ -37,7 +37,7 @@ class WP:
             raise Exception("Unsupported type encountered while parsing flag.")
         
         self.flags.append(Flag(f_name, f_type, flag_list[2]))
-
+    # TODO: check if data is instance of flag type
     def parse_shortcut(self, shortcut_string):
         shortcut_list = shlex.split(shortcut_string)
         flag_list: ShortcutFlag = []
@@ -50,7 +50,7 @@ class WP:
                     elif self.flags[j].f_type == float:
                         data = float(shortcut_list[i + 1])
                     else:
-                        data = shortcut_list[i + 1]
+                        data = str("\"" + shortcut_list[i + 1] + "\"")
                     
                     flag_list.append(ShortcutFlag(self.flags[j].f_name, self.flags[j], data))
         
@@ -69,7 +69,23 @@ class WP:
                 pass
             else:
                 raise Exception("Unexpected token encountered.")
-            
+    
+    def print(self):
+        print("Executable: " + self.executable)
+
+        print("Supported flags:")
+        for flag in self.flags:
+            print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment)
+
+        print("\n\nSupported shortcuts:")
+        for sc in self.shortcuts:
+            print(sc[0], end=" ")
+            for flag in sc[1]:
+                print(flag.s_name + " " + str(flag.flag[1]), end=" ")
+            print("\n")
+
+        
+
 
 def main():
     if "wconfig" not in listdir():
@@ -77,14 +93,9 @@ def main():
     
     wp = WP(open("wconfig", 'r'))
 
-    for flag in wp.flags:
-        print(flag.f_name + " <" + flag.f_type.__name__ + "> ->" + flag.f_comment)
+    if len(sys.argv) > 1 and sys.argv[1] == '?':
+        wp.print()
 
-    for sc in wp.shortcuts:
-        print(sc[0], end=" ")
-        for flag in sc[1]:
-            print(flag.s_name + " " + str(flag.flag[1]), end=" ")
-        print("\n")
     
 
 if __name__ == "__main__":
