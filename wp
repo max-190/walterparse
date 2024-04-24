@@ -124,8 +124,7 @@ class WalterParser:
     
     
     def convert_to_call(self, flag_list: list) -> list:
-        call = []
-        call.append(self.executable[:-1])
+        call = [self.executable[:-1]]
         for flag in flag_list:
             call.append(str(flag.flag[1]))
         
@@ -135,24 +134,24 @@ class WalterParser:
     # OTHER FUNCTIONS ##########################################################
 
     def print(self):
-        print("Executable: " + self.executable + "\n")
+        print("Executable: " + self.executable)
 
-        print("Supported flags:\n")
+        print("Supported flags:")
         for flag in self.flags:
-            print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment + "\n")
+            print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment)
 
-        print("\nSupported shortcuts:\n")
+        print("\nSupported shortcuts:")
         for sc in self.shortcuts:
-            print(sc[0] + " ")
+            print(sc[0], end=" ")
             for flag in sc[1]:
-                print(flag.name + " " + str(flag.flag[1]) + " ")
+                print(flag.name + " " + str(flag.flag[1]), end=" ")
           
-        print("\n\nDefault call:\n")
+        print("\n\nDefault call:")
         # TODO: executable contains newline or something
-        print(self.executable[:-1] + " ")
+        print(self.executable[:-1], end=" ")
         for flag in self.default:
-            print(flag.name + " " + str(flag.flag[1]) + " ")
-        print("\n")
+            print(flag.name + " " + str(flag.flag[1]), end=" ")
+        print()
 
 
 def main():
@@ -167,6 +166,7 @@ def main():
         user_flags = wp.default
     elif len(argv) > 1 and argv[1] == '?':
         wp.print()
+        return
     elif len(argv) == 2:
         if argv[1].startswith('='):
             user_flags = wp.merge_shortcut_with_default(argv[1])
