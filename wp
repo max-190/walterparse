@@ -20,7 +20,7 @@ class FlagData:
         self.flag = (flag, data)
     
 
-class WP:
+class WalterParser:
 
     # CONSTRUCTOR ##############################################################
 
@@ -159,7 +159,7 @@ def main():
     if "wconfig" not in listdir():
         raise Exception("wconfig not found.")
     
-    wp = WP(open("wconfig", 'r'))
+    wp = WalterParser(open("wconfig", 'r'))
 
     if len(sys.argv) == 1:
         if not wp.default_defined:
