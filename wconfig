@@ -1,8 +1,12 @@
+# File to be executed
 ./test
 
+# List of flags with expected type and information about the flag
 -m string "Word or message to be printed. Strings must be enclosed in parenteses."
 -n integer "Number of times the message should be repeated."
 
+# List of default values, must contain all flags (for now)
 > -m "Hi there!" -n 1
 
+# List of shortcuts, optional
 =hw -n 5 -m "Hello, world!"

@@ -41,7 +41,7 @@ class WalterParser:
                 self.default_defined = True
                 if len(self.default) != len(self.flags):
                     raise Exception("Default does not contain correct amount of flags.")
-            elif line in ["", "\n"]:
+            elif line in ["", "\n"] or line.startswith('#'):
                 pass
             else:
                 raise Exception("Unexpected token encountered: " + line.split()[0])
@@ -50,7 +50,8 @@ class WalterParser:
     # MEMBER VARIABLES #########################################################
 
     flags: list[Flag] = []
-    shortcuts = []  # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
+    default: list[FlagData] = []
+    shortcuts: list[tuple[str, list[FlagData]]] = []  # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
     
     # WCONFIG PARSERS ##########################################################
 
@@ -140,13 +141,15 @@ class WalterParser:
         for flag in self.flags:
             print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment)
 
-        print("\nSupported shortcuts:")
-        for sc in self.shortcuts:
-            print(sc[0], end=" ")
-            for flag in sc[1]:
-                print(flag.name + " " + str(flag.flag[1]), end=" ")
+        if len(self.shortcuts) > 0:
+            print("\nSupported shortcuts:")
+            for sc in self.shortcuts:
+                print(sc[0], end=" ")
+                for flag in sc[1]:
+                    print(flag.name + " " + str(flag.flag[1]), end=" ")
+            print()
           
-        print("\n\nDefault call:")
+        print("\nDefault call:")
         # TODO: executable contains newline or something
         print(self.executable[:-1], end=" ")
         for flag in self.default:
