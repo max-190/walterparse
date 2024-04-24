@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+
 import sys
 from os import listdir
-import shlex
+from shlex import split as sh_split
+from subprocess import run as sp_run
+
 
 
 class Flag:
@@ -8,6 +12,7 @@ class Flag:
         self.f_name = f_name
         self.f_type = f_type
         self.f_comment = f_comment
+
 
 class FlagData:
     def __init__(self, name:str, flag: Flag, data):
@@ -19,13 +24,13 @@ class WP:
 
     # MEMBER VARIABLES /////////////////////////////////////////////////////////
 
-    flags: Flag = []
-    shortcuts = [] # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
-
+    flags: list[Flag] = []
+    shortcuts = []  # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
+    
     # WCONFIG PARSERS //////////////////////////////////////////////////////////
 
     def parse_flag(self, flag_string):
-        flag_list = shlex.split(flag_string)
+        flag_list = sh_split(flag_string)
         if len(flag_list) != 3:
             raise Exception("Flag in unsupported format.")
         
@@ -54,7 +59,7 @@ class WP:
                         elif self.flags[j].f_type == float:
                             data = float(data_list[i + 1])
                         else:
-                            data = str("\"" + data_list[i + 1] + "\"")
+                            data = str(data_list[i + 1])
                         
                         flag_list.append(FlagData(self.flags[j].f_name, self.flags[j], data))
                         found = True
@@ -89,10 +94,11 @@ class WP:
         
         return user_list
     
-    def convert_to_call(self, flag_list: list) -> str:
-        call = self.executable[:-1] + " "
+    def convert_to_call(self, flag_list: list) -> list:
+        call = []
+        call.append(self.executable[:-1])
         for flag in flag_list:
-            call += str(flag.flag[1]) + " "
+            call.append(str(flag.flag[1]))
         
         return call
                      
@@ -102,7 +108,7 @@ class WP:
     def __init__(self, config_file):
         self.default_defined = False
         for line in config_file.readlines():
-            data_list = shlex.split(line)
+            data_list = sh_split(line)
             if line.startswith("./"):
                 self.executable = line
             elif line.startswith('-'):
@@ -144,7 +150,7 @@ class WP:
             sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
         sys.stderr.write("\n")
 
-def main() -> str:
+def main():
     if "wconfig" not in listdir():
         raise Exception("wconfig not found.")
     
@@ -156,17 +162,16 @@ def main() -> str:
         user_flags = wp.default
     elif len(sys.argv) > 1 and sys.argv[1] == '?':
         wp.print()
-        return ""
     elif len(sys.argv) == 2:
         if sys.argv[1].startswith('='):
             user_flags = wp.merge_shortcut_with_default(sys.argv[1])
     else:        
         user_flags = wp.parse_data(sys.argv)
         user_flags = wp.merge_with_default(user_flags)
-            
+
 
     user_flags = wp.order(user_flags)
-    print(wp.convert_to_call(user_flags))
+    sp_run(wp.convert_to_call(user_flags))
     
 
 if __name__ == "__main__":
