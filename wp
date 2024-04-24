@@ -54,7 +54,7 @@ class WalterParser:
     
     # WCONFIG PARSERS ##########################################################
 
-    def parse_flag(self, flag_string):
+    def parse_flag(self, flag_string) -> None:
         flag_list = sh_split(flag_string)
         if len(flag_list) != 3:
             raise Exception("Flag in unsupported format.")
@@ -72,8 +72,8 @@ class WalterParser:
         self.flags.append(Flag(f_name, f_type, flag_list[2]))
     
 
-    def parse_data(self, data_list: list):
-        flag_list: FlagData = []
+    def parse_data(self, data_list: list) -> list[FlagData]:
+        flag_list: list[FlagData] = []
         for i in range(1, len(data_list), 2):
             found = False
             for j in range(len(self.flags)):
@@ -133,7 +133,7 @@ class WalterParser:
     
     # OTHER FUNCTIONS ##########################################################
 
-    def print(self):
+    def print(self) -> None:
         print("Executable: " + self.executable)
 
         print("Supported flags:")
@@ -154,7 +154,7 @@ class WalterParser:
         print()
 
 
-def main():
+def main() -> None:
     if "wconfig" not in listdir():
         raise Exception("wconfig not found.")
     
