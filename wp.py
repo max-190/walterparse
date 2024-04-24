@@ -22,12 +22,37 @@ class FlagData:
 
 class WP:
 
-    # MEMBER VARIABLES /////////////////////////////////////////////////////////
+    # CONSTRUCTOR ##############################################################
+
+    def __init__(self, config_file):
+        self.default_defined = False
+        for line in config_file.readlines():
+            data_list = sh_split(line)
+            if line.startswith("./"):
+                self.executable = line
+            elif line.startswith('-'):
+                self.parse_flag(line)
+            elif line.startswith('='):
+                self.shortcuts.append((data_list[0], self.parse_data(data_list)))
+            elif line.startswith('>'):
+                if self.default_defined:
+                    raise Exception("Default flags were already defined.")
+                self.default = self.parse_data(data_list)
+                self.default_defined = True
+                if len(self.default) != len(self.flags):
+                    raise Exception("Default does not contain correct amount of flags.")
+            elif line in ["", "\n"]:
+                pass
+            else:
+                raise Exception("Unexpected token encountered: " + line.split()[0])
+    
+
+    # MEMBER VARIABLES #########################################################
 
     flags: list[Flag] = []
     shortcuts = []  # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
     
-    # WCONFIG PARSERS //////////////////////////////////////////////////////////
+    # WCONFIG PARSERS ##########################################################
 
     def parse_flag(self, flag_string):
         flag_list = sh_split(flag_string)
@@ -70,12 +95,14 @@ class WP:
   
         return flag_list
     
-    # RUN PREPPING /////////////////////////////////////////////////////////////
+    
+    # RUN PREPPING #############################################################
 
     def merge_shortcut_with_default(self, s_name: str) -> list:
         for sc in self.shortcuts:
             if s_name == sc[0]:
                 return self.merge_with_default(sc[1])
+    
 
     def merge_with_default(self, user_list: list) -> list:
         for d_flag in self.default:
@@ -83,6 +110,7 @@ class WP:
                 user_list.append(d_flag)
         
         return user_list
+    
 
     def order(self, user_list: list) -> list:
         for i in range(len(self.flags)): # len(flags) should equal len(user_list)
@@ -94,6 +122,7 @@ class WP:
         
         return user_list
     
+    
     def convert_to_call(self, flag_list: list) -> list:
         call = []
         call.append(self.executable[:-1])
@@ -101,34 +130,9 @@ class WP:
             call.append(str(flag.flag[1]))
         
         return call
-                     
-
-    # CONSTRUCTOR //////////////////////////////////////////////////////////////
-
-    def __init__(self, config_file):
-        self.default_defined = False
-        for line in config_file.readlines():
-            data_list = sh_split(line)
-            if line.startswith("./"):
-                self.executable = line
-            elif line.startswith('-'):
-                self.parse_flag(line)
-            elif line.startswith('='):
-                self.shortcuts.append((data_list[0], self.parse_data(data_list)))
-            elif line.startswith('>'):
-                if self.default_defined:
-                    raise Exception("Default flags were already defined.")
-                self.default = self.parse_data(data_list)
-                self.default_defined = True
-                if len(self.default) != len(self.flags):
-                    raise Exception("Default does not contain correct amount of flags.")
-
-            elif line in ["", "\n"]:
-                pass
-            else:
-                raise Exception("Unexpected token encountered: " + line.split()[0])
     
-    # OTHER FUNCTIONS //////////////////////////////////////////////////////////
+    
+    # OTHER FUNCTIONS ##########################################################
 
     def print(self):
         sys.stderr.write("Executable: " + self.executable + "\n")
@@ -149,6 +153,7 @@ class WP:
         for flag in self.default:
             sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
         sys.stderr.write("\n")
+
 
 def main():
     if "wconfig" not in listdir():
