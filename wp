@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+from sys import argv
 from os import listdir
 from shlex import split as sh_split
 from subprocess import run as sp_run
@@ -135,24 +135,24 @@ class WalterParser:
     # OTHER FUNCTIONS ##########################################################
 
     def print(self):
-        sys.stderr.write("Executable: " + self.executable + "\n")
+        print("Executable: " + self.executable + "\n")
 
-        sys.stderr.write("Supported flags:\n")
+        print("Supported flags:\n")
         for flag in self.flags:
-            sys.stderr.write(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment + "\n")
+            print(flag.f_name + " <" + flag.f_type.__name__ + "> => " + flag.f_comment + "\n")
 
-        sys.stderr.write("\nSupported shortcuts:\n")
+        print("\nSupported shortcuts:\n")
         for sc in self.shortcuts:
-            sys.stderr.write(sc[0] + " ")
+            print(sc[0] + " ")
             for flag in sc[1]:
-                sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
+                print(flag.name + " " + str(flag.flag[1]) + " ")
           
-        sys.stderr.write("\n\nDefault call:\n")
+        print("\n\nDefault call:\n")
         # TODO: executable contains newline or something
-        sys.stderr.write(self.executable[:-1] + " ")
+        print(self.executable[:-1] + " ")
         for flag in self.default:
-            sys.stderr.write(flag.name + " " + str(flag.flag[1]) + " ")
-        sys.stderr.write("\n")
+            print(flag.name + " " + str(flag.flag[1]) + " ")
+        print("\n")
 
 
 def main():
@@ -161,17 +161,17 @@ def main():
     
     wp = WalterParser(open("wconfig", 'r'))
 
-    if len(sys.argv) == 1:
+    if len(argv) == 1:
         if not wp.default_defined:
             raise Exception("No default flags were defined in wconfig")
         user_flags = wp.default
-    elif len(sys.argv) > 1 and sys.argv[1] == '?':
+    elif len(argv) > 1 and argv[1] == '?':
         wp.print()
-    elif len(sys.argv) == 2:
-        if sys.argv[1].startswith('='):
-            user_flags = wp.merge_shortcut_with_default(sys.argv[1])
+    elif len(argv) == 2:
+        if argv[1].startswith('='):
+            user_flags = wp.merge_shortcut_with_default(argv[1])
     else:        
-        user_flags = wp.parse_data(sys.argv)
+        user_flags = wp.parse_data(argv)
         user_flags = wp.merge_with_default(user_flags)
 
 
