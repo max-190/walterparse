@@ -26,10 +26,14 @@ class WalterParser:
     def __init__(self, config_file):
         self.is_strict = True
         self.default_defined = False
+        self.executable_defined = False
         for line in config_file.readlines():
             data_list = sh_split(line)
             if line.startswith("./"):
+                if self.executable_defined:
+                    raise Exception("Executable " + self.executable[:-1] + " was already defined, but " + line[:-1] + " was found.")
                 self.executable = line
+                self.executable_defined = True
             elif line.startswith('-'):
                 self.parse_flag(line)
             elif line.startswith('='):
