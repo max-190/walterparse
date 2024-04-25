@@ -70,6 +70,8 @@ class WalterParser:
             f_type = str
         elif (flag_list[1] in ["float", "double"]):
             f_type = float
+        elif (flag_list[1] in ["none", "None"]):
+            f_type = None
         else:
             raise Exception("Unsupported type encountered while parsing flag.")
         
