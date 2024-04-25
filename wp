@@ -193,7 +193,7 @@ def main() -> None:
         return
     elif len(argv) > 1 and argv[1].startswith('='):
         sc_user_flags = wp.merge_shortcut_with_default(argv[1])
-        user_flags = wp.parse_data(argv[1:])
+        user_flags = wp.parse_data(argv[1:]) # remove first item or shortcut will be parsed
         user_flags = wp.merge_lists(user_flags, sc_user_flags)
     else:        
         user_flags = wp.parse_data(argv)
@@ -205,7 +205,7 @@ def main() -> None:
     
 
 if __name__ == "__main__":
-    # try:
+    try:
         main()
-    # except Exception as e:
-    #     print(str(e))
+    except Exception as e:
+        print(str(e))
