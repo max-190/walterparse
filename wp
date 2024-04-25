@@ -143,7 +143,10 @@ class WalterParser:
     def convert_to_call(self, flag_list: list) -> list:
         call = [self.executable[:-1]]
         for flag in flag_list:
-            call.append(str(flag.flag[1]))
+            if not self.is_strict:
+                call.append(str(flag.name))
+            if flag.flag[0].f_type != None:
+                call.append(str(flag.flag[1]))
         
         return call
     
