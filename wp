@@ -163,6 +163,8 @@ def main() -> None:
     
     wp = WalterParser(open("wconfig", 'r'))
 
+    user_flags = []
+
     if len(argv) == 1:
         if not wp.default_defined:
             raise Exception("No default flags were defined in wconfig")
@@ -170,17 +172,20 @@ def main() -> None:
     elif len(argv) > 1 and argv[1] == '?':
         wp.print()
         return
-    elif len(argv) == 2:
-        if argv[1].startswith('='):
-            user_flags = wp.merge_shortcut_with_default(argv[1])
+    elif len(argv) == 2 and argv[1].startswith('='):
+        user_flags = wp.merge_shortcut_with_default(argv[1])
     else:        
         user_flags = wp.parse_data(argv)
         user_flags = wp.merge_with_default(user_flags)
 
 
     user_flags = wp.order(user_flags)
+    print(wp.convert_to_call(user_flags))
     sp_run(wp.convert_to_call(user_flags))
     
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(str(e))
