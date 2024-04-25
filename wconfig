@@ -2,14 +2,16 @@
 ./test
 
 # How the flags should be parsed; Strict by default
-mode = strict
+mode = lax
 
 # List of flags with expected type and information about the flag
 -m string "Word or message to be printed. Strings must be enclosed in parenteses."
 -n integer "Number of times the message should be repeated."
+# Note that this flag does not work on test.cpp; only for testing purposes
+-c none "If message should be printed in all caps."
 
 # List of default values, must contain all flags (for now)
-> -m "Hi there!" -n 1
+> -m "Hi there!" -n 1 -c
 
 # List of shortcuts, optional
 =hw -n 5 -m "Hello, world!"

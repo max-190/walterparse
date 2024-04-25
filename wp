@@ -71,6 +71,8 @@ class WalterParser:
         elif (flag_list[1] in ["float", "double"]):
             f_type = float
         elif (flag_list[1] in ["none", "None"]):
+            if self.is_strict:
+                raise Exception("Flags that take no arguments are not supported when strict = true.")
             f_type = None
         else:
             raise Exception("Unsupported type encountered while parsing flag.")
@@ -103,7 +105,7 @@ class WalterParser:
                         found = True
                         break
                 except:
-                    raise Exception("Data type invalid. Expected: " + flag.f_type.__name__ + ", got: " + data_list[i + 1])
+                    raise Exception("Data type invalid. Expected: " + flag.f_type.__name__ + ", got: " + (data_list[i + 1] if i + 1 < len(data_list) else "\"\""))
             if not found:
                 raise Exception("Flag not defined: " + data_list[i])
         return flag_list
@@ -116,7 +118,7 @@ class WalterParser:
         for sc in self.shortcuts:
             if s_name == sc[0]:
                 return self.merge_with_default(sc[1])
-        raise Exception("Shortcut not found.")
+        raise Exception("Shortcut \"" + s_name + "\" not found.")
     
 
     def merge_with_default(self, user_list: list) -> list:
