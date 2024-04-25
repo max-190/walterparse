@@ -117,16 +117,16 @@ class WalterParser:
     def merge_shortcut_with_default(self, s_name: str) -> list:
         for sc in self.shortcuts:
             if s_name == sc[0]:
-                return self.merge_with_default(sc[1])
+                return self.merge_lists(sc[1], self.default)
         raise Exception("Shortcut \"" + s_name + "\" not found.")
     
 
-    def merge_with_default(self, user_list: list) -> list:
-        for d_flag in self.default:
-            if d_flag.name not in [u.name for u in user_list]:
-                user_list.append(d_flag)
+    def merge_lists(self, primary_list: list, secondary_list: list) -> list:
+        for secondary_flag in secondary_list:
+            if secondary_flag.name not in [u.name for u in primary_list]:
+                primary_list.append(secondary_flag)
         
-        return user_list
+        return primary_list
     
 
     def order(self, user_list: list) -> list:
@@ -191,11 +191,13 @@ def main() -> None:
     elif len(argv) > 1 and argv[1] == '?':
         wp.print()
         return
-    elif len(argv) == 2 and argv[1].startswith('='):
-        user_flags = wp.merge_shortcut_with_default(argv[1])
+    elif len(argv) > 1 and argv[1].startswith('='):
+        sc_user_flags = wp.merge_shortcut_with_default(argv[1])
+        user_flags = wp.parse_data(argv[1:])
+        user_flags = wp.merge_lists(user_flags, sc_user_flags)
     else:        
         user_flags = wp.parse_data(argv)
-        user_flags = wp.merge_with_default(user_flags)
+        user_flags = wp.merge_lists(user_flags, wp.default)
 
 
     user_flags = wp.order(user_flags)
@@ -203,7 +205,7 @@ def main() -> None:
     
 
 if __name__ == "__main__":
-    try:
+    # try:
         main()
-    except Exception as e:
-        print(str(e))
+    # except Exception as e:
+    #     print(str(e))
