@@ -6,7 +6,6 @@ from shlex import split as sh_split
 from subprocess import run as sp_run
 
 
-
 class Flag:
     def __init__(self, f_name: str, f_type: type, f_comment: str):
         self.f_name = f_name
@@ -25,6 +24,7 @@ class WalterParser:
     # CONSTRUCTOR ##############################################################
 
     def __init__(self, config_file):
+        self.is_strict = True
         self.default_defined = False
         for line in config_file.readlines():
             data_list = sh_split(line)
@@ -39,8 +39,11 @@ class WalterParser:
                     raise Exception("Default flags were already defined.")
                 self.default = self.parse_data(data_list)
                 self.default_defined = True
-                if len(self.default) != len(self.flags):
-                    raise Exception("Default does not contain correct amount of flags.")
+                if len(self.default) != len(self.flags) and self.is_strict:
+                    raise Exception("Default does not contain correct amount of flags since mode = strict.")
+            elif line.startswith("mode"):
+                if "lax" in line:
+                    self.is_strict = False
             elif line in ["", "\n"] or line.startswith('#'):
                 pass
             else:
@@ -72,29 +75,37 @@ class WalterParser:
         
         self.flags.append(Flag(f_name, f_type, flag_list[2]))
     
-
+    
     def parse_data(self, data_list: list) -> list[FlagData]:
         flag_list: list[FlagData] = []
-        for i in range(1, len(data_list), 2):
+        i = 1
+        while i < len(data_list):
             found = False
-            for j in range(len(self.flags)):
+            for flag in self.flags:
                 try:
-                    if data_list[i] == self.flags[j].f_name:
-                        if self.flags[j].f_type ==  int:
+                    if data_list[i] == flag.f_name:
+                        if flag.f_type == int:
                             data = int(data_list[i + 1])
-                        elif self.flags[j].f_type == float:
+                            i += 2
+                        elif flag.f_type == float:
                             data = float(data_list[i + 1])
+                            i += 2
+                        elif flag.f_type == None:
+                            data = None
+                            i += 1
                         else:
                             data = str(data_list[i + 1])
+                            i += 2
                         
-                        flag_list.append(FlagData(self.flags[j].f_name, self.flags[j], data))
+                        flag_list.append(FlagData(flag.f_name, flag, data))
                         found = True
+                        break
                 except:
-                    raise Exception("Data type invalid. Expected: " + self.flags[j].f_type.__name__ + ", got: " + data_list[i + 1])
+                    raise Exception("Data type invalid. Expected: " + flag.f_type.__name__ + ", got: " + data_list[i + 1])
             if not found:
                 raise Exception("Flag not defined: " + data_list[i])
-  
         return flag_list
+
     
     
     # RUN PREPPING #############################################################
@@ -103,6 +114,7 @@ class WalterParser:
         for sc in self.shortcuts:
             if s_name == sc[0]:
                 return self.merge_with_default(sc[1])
+        raise Exception("Shortcut not found.")
     
 
     def merge_with_default(self, user_list: list) -> list:
@@ -180,7 +192,6 @@ def main() -> None:
 
 
     user_flags = wp.order(user_flags)
-    print(wp.convert_to_call(user_flags))
     sp_run(wp.convert_to_call(user_flags))
     
 
