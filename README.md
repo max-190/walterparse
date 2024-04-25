@@ -20,6 +20,7 @@ mode = <mode>
 
 -<m> <m_type> <m_comment>
 -<n> <n_type> <n_comment>
+-<o> ...
 
 > -<m> <m_data> -<n> <n_data>
 
