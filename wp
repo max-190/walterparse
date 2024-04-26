@@ -26,6 +26,7 @@ class WalterParser:
 
     def __init__(self, config_file):
         self.is_strict = True
+        self.allow_strings = False
         self.default_defined = False
         self.executable_defined = False
         for line in config_file.readlines():
@@ -49,6 +50,11 @@ class WalterParser:
             elif line.startswith("mode"):
                 if "lax" in line:
                     self.is_strict = False
+            elif line.startswith("allowStrings"):
+                if "true" in line or "True" in line or "1" in line:
+                    if self.is_strict:
+                        raise Exception("allowStrings cannot be true when mode = strict.")
+                    self.allow_strings = True                
             elif line in ["", "\n"] or line.startswith('#'):
                 pass
             else:

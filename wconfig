@@ -2,12 +2,15 @@
 ./test
 
 # How the flags should be parsed; Strict by default
-mode = lax
+mode = strict
+# If extra strings without flags should be passed to executable
+# false by default
+allowStrings = false
 # List of flags with expected type and information about the flag
 -m string "Word or message to be printed. Strings must be enclosed in parenteses."
--n none "Number of times the message should be repeated."
+-n int "Number of times the message should be repeated."
 
-# List of default values, must contain all flags (for now)
+# List of default values, must contain all flags when mode = lax
 > -m "Hi there!" -n
 
 # List of shortcuts, optional
