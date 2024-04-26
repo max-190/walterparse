@@ -32,8 +32,8 @@ class WalterParser:
             data_list = sh_split(line)
             if line.startswith("./"):
                 if self.executable_defined:
-                    raise Exception("Executable " + self.executable[:-1] + " was already defined, but " + line[:-1] + " was found.")
-                self.executable = line
+                    raise Exception("Executable " + self.executable + " was already defined, but " + line[:-1] + " was found.")
+                self.executable = line[:-1]
                 self.executable_defined = True
             elif line.startswith('-'):
                 self.parse_flag(line)
@@ -117,7 +117,6 @@ class WalterParser:
         return flag_list
 
     
-    
     # RUN PREPPING #############################################################
 
     def merge_shortcut_with_default(self, s_name: str) -> list[FlagData]:
@@ -147,7 +146,7 @@ class WalterParser:
     
     
     def convert_to_call(self, flag_list: list[FlagData]) -> list[str]:
-        call = [self.executable[:-1]]
+        call = [self.executable]
         for flag in flag_list:
             if not self.is_strict:
                 call.append(str(flag.name))
@@ -162,7 +161,7 @@ class WalterParser:
     def print(self) -> None:
         print("Executable: " + self.executable)
 
-        print("Supported flags:")
+        print("\nSupported flags:")
         for flag in self.flags:
             print(flag.f_name + " <" + (flag.f_type.__name__ if flag.f_type != None else "None") + "> => " + flag.f_comment)
 
@@ -175,8 +174,7 @@ class WalterParser:
             print()
           
         print("\nDefault call:")
-        # TODO: executable contains newline or something
-        print(self.executable[:-1], end=" ")
+        print(self.executable, end=" ")
         for flag in self.default:
             print(flag.name + (str(" " + flag.flag[1]) if flag.flag[0].f_type != None else ""), end=" ")
         print()
