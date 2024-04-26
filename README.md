@@ -43,7 +43,7 @@ The format WalterParse maintains when calling the executable. There are two diff
 - `lax`:
     - The flags including the data will be passed to the executable. The data is ordered in the same order as the flags are defined in `wconfig`. For example, the default call when using the `wconfig` file included with this repository is:  
     `./test -m "Hi there!" -n 1`
-    - The default call in the `wconfig` file may contain less flags than the total number of flags defined.
+    - The default call in the `wconfig` file may contain zero, some, or all previously defined flags.
     - `None`-flags are supported: you can pass flags to the executable that do not bring data with it.
 
 ### `-<m> <m_type> <m_comment>`

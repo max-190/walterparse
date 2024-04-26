@@ -189,7 +189,7 @@ def main() -> None:
     user_flags = []
 
     if len(argv) == 1:
-        if not wp.default_defined:
+        if not wp.default_defined and wp.is_strict:
             raise Exception("No default flags were defined in wconfig")
         user_flags = wp.default
     elif len(argv) > 1 and argv[1] == '?':
