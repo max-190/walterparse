@@ -2,14 +2,14 @@
 ./test
 
 # How the flags should be parsed; Strict by default
-mode = strict
+mode = lax
 
 # List of flags with expected type and information about the flag
 -m string "Word or message to be printed. Strings must be enclosed in parenteses."
--n integer "Number of times the message should be repeated."
+-n none "Number of times the message should be repeated."
 
 # List of default values, must contain all flags (for now)
-> -m "Hi there!" -n 1
+> -m "Hi there!" -n
 
 # List of shortcuts, optional
-=hw -n 5 -m "Hello, world!"
+=hw -n -m "Hello, world!"
