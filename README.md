@@ -17,6 +17,7 @@ An example of a correct `wconfig` file should be included with the Git repositor
 ./<executable>
 
 mode = <mode>
+allowStrings = <bool>
 
 -<m> <m_type> <m_comment>
 -<n> <n_type> <n_comment>
@@ -45,6 +46,16 @@ The format WalterParse maintains when calling the executable. There are two diff
     `./test -m "Hi there!" -n 1`
     - The default call in the `wconfig` file may contain zero, some, or all previously defined flags.
     - `None`-flags are supported: you can pass flags to the executable that do not bring data with it.
+
+### `allowStrings = <bool>`
+If WalterParse should allow arguments not preceded by a flag. `allowStrings = false` by default. May only be true if `mode = lax`.
+
+For example, running  
+`wp path/to/file`  
+will result in the following call to the executable, assuming the aforementioned included `wconfig` file:  
+`./test -m "Hi there!" -n 1 path/to/file`.  
+
+**IMPORTANT**: Setting `allowStrings` to `true` makes the parser a lot less strict! For example, undefined flags will be passed to the executable as a flagless string, instead of raising an exception.
 
 ### `-<m> <m_type> <m_comment>`
 Definition of the flags. The flags must be of the following form:

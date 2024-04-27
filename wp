@@ -66,6 +66,7 @@ class WalterParser:
     flags: list[Flag] = []
     default: list[FlagData] = []
     shortcuts: list[tuple[str, list[FlagData]]] = []  # Contains tuple with sc[0] = sc_name, sc[1] = list of ShortcutFlag
+    flagless_strings: list[str] = []
     
     # WCONFIG PARSERS ##########################################################
 
@@ -106,15 +107,22 @@ class WalterParser:
                         elif flag.f_type == float:
                             data = float(data_list[i + 1])
                             i += 2
+                        elif flag.f_type == str:
+                            data = str(data_list[i + 1])
+                            i += 2
                         elif flag.f_type == None:
                             data = None
                             i += 1
                         else:
-                            data = str(data_list[i + 1])
-                            i += 2
+                            raise Exception("Flag of unsupported type.")
                         
                         flag_list.append(FlagData(flag.f_name, flag, data))
                         found = True
+                        break
+                    elif self.allow_strings and data_list[i] not in [f.f_name for f in self.flags]:
+                        self.flagless_strings.append(data_list[i])
+                        found = True
+                        i += 1
                         break
                 except:
                     raise Exception("Data type invalid. Expected: " + (flag.f_type.__name__ if flag.f_type != None else "None") + ", got: " + (data_list[i + 1] if i + 1 < len(data_list) else "\"\""))
@@ -176,13 +184,13 @@ class WalterParser:
             for sc in self.shortcuts:
                 print(sc[0], end=" ")
                 for flag in sc[1]:
-                    print(flag.name + (str(" " + flag.flag[1]) if flag.flag[0].f_type != None else ""), end=" ")
+                    print(flag.name + (" " + str(flag.flag[1]) if flag.flag[0].f_type != None else ""), end=" ")
             print()
           
         print("\nDefault call:")
         print(self.executable, end=" ")
         for flag in self.default:
-            print(flag.name + (str(" " + flag.flag[1]) if flag.flag[0].f_type != None else ""), end=" ")
+            print(flag.name + (" " + str(flag.flag[1]) if flag.flag[0].f_type != None else ""), end=" ")
         print()
 
 
@@ -192,7 +200,7 @@ def main() -> None:
     
     wp = WalterParser(open("wconfig", 'r'))
 
-    user_flags = []
+    user_flags: list[FlagData] = []
 
     if len(argv) == 1:
         if not wp.default_defined and wp.is_strict:
@@ -209,9 +217,11 @@ def main() -> None:
         user_flags = wp.parse_data(argv)
         user_flags = wp.merge_lists(user_flags, wp.default)
 
-
     user_flags = wp.order(user_flags)
-    sp_run(wp.convert_to_call(user_flags))
+    call: list[str] = wp.convert_to_call(user_flags)
+    call.extend(wp.flagless_strings)
+    print("Calling: " + " ".join(call))
+    sp_run(call)
     
 
 if __name__ == "__main__":
